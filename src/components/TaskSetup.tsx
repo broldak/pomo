@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TextInput, NumberInput, Button, Box, Text, ActionIcon, Stack, Flex, Title, Container } from '@mantine/core'
+import { TextInput, NumberInput, Button, Box, Text, ActionIcon, Stack, Flex, Title, Container, Group, Image } from '@mantine/core'
 import { IconSettings } from '@tabler/icons-react'
 import { mantineColors } from '../theme'
 import classes from './NumberInput.module.css'
@@ -37,7 +37,10 @@ export function TaskSetup({ settings, onStart, onOpenSettings }: TaskSetupProps)
     >
       <Container display="flex" style={{ flexDirection: "column" }} w="100%" h="100%" size="lg">
         <Flex justify="space-between" align="center" w="100%">
-          <Title size="30px" order={1} fw={300} c="gray.5">pomo</Title>
+          <Group gap="xs" align="center">
+            <Image src="tomato.svg" w="24" h="24" />
+            <Title size="30px" order={1} fw={300} c="gray.5">pomo</Title>
+          </Group>
           <ActionIcon
             onClick={onOpenSettings}
             variant="subtle"
