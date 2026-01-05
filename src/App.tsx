@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Container, Title, Stack } from '@mantine/core'
+import { Container, Stack } from '@mantine/core'
 import { TaskSetup } from './components/TaskSetup'
 import { Timer } from './components/Timer'
 import { Settings, type SettingsValues } from './components/Settings'
