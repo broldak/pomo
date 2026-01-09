@@ -23,6 +23,16 @@ export default function Account() {
   const { data: slackIntegration, isLoading: isLoadingSlackIntegration } =
     useGetSlackIntegration();
 
+  const env = import.meta.env.VITE_VERCEL_ENV;
+
+  let slackAuthorizationUrl = "";
+
+  if (env === "production") {
+    slackAuthorizationUrl = `https://pomo-backend-phi.vercel.app/api/v1/integrations/slack/authorize`;
+  } else {
+    slackAuthorizationUrl = `${window.location.origin}/api/v1/integrations/slack/authorize`;
+  }
+
   const handleConnectSlack = () => {
     // TODO: Implement Slack OAuth flow
     console.log("Connect to Slack clicked");
@@ -158,7 +168,7 @@ export default function Account() {
                             interruptions.
                           </Text>
                           <Link
-                            to={`${window.location.origin}/api/v1/integrations/slack/authorize`}
+                            to={slackAuthorizationUrl}
                             style={{ textDecoration: "none" }}
                           >
                             <Button
