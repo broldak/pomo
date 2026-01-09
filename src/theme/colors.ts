@@ -3,6 +3,8 @@ export const colors = {
   // Mode backgrounds
   work: 'var(--mantine-color-red-9)',
   break: 'var(--mantine-color-teal-9)',
+  link: 'var(--mantine-color-gray-4)',
+  success: 'var(--mantine-color-green-6)',
 
   // Text colors with opacity variants
   text: {
