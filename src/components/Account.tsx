@@ -10,12 +10,20 @@ import {
   Card,
   Group,
   Center,
+  Alert,
 } from "@mantine/core";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { colors } from "../theme";
-import { IconBrandSlack, IconCheck, IconX } from "@tabler/icons-react";
+import {
+  IconAlertCircle,
+  IconBrandSlack,
+  IconCheck,
+  IconX,
+} from "@tabler/icons-react";
 import useSupabase from "../hooks/useSupabase";
 import useGetSlackIntegration from "../hooks/useGetSlackIntegration";
+import useGetSlackIntegrationRedirectUrlMutation from "../hooks/useGetSlackIntegrationRedirectUrlMutation";
+import { useState } from "react";
 
 // TODO: Improve account page layout and design
 export default function Account() {
@@ -23,19 +31,25 @@ export default function Account() {
   const { data: slackIntegration, isLoading: isLoadingSlackIntegration } =
     useGetSlackIntegration();
 
-  const env = import.meta.env.VITE_VERCEL_ENV;
+  const [searchParams] = useSearchParams();
 
-  let slackConnectUrl = "";
+  const [userCancelledRequest, setUserCancelledRequest] = useState(
+    searchParams.get("cancelled_request") === "true"
+  );
+  const [error, setError] = useState(searchParams.get("error") ?? null);
 
-  if (env === "production") {
-    slackConnectUrl = `https://pomo-backend-phi.vercel.app/api/v1/integrations/slack/connect`;
-  } else {
-    slackConnectUrl = `${window.location.origin}/api/v1/integrations/slack/connect`;
-  }
+  const mutate = useGetSlackIntegrationRedirectUrlMutation();
 
-  const handleConnectSlack = () => {
-    // TODO: Implement Slack OAuth flow
-    console.log("Connect to Slack clicked");
+  const handleConnectSlack = async () => {
+    try {
+      const redirectUrl = await mutate.mutateAsync();
+
+      console.log(redirectUrl);
+
+      window.location.href = redirectUrl.url;
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleSignOut = async () => {
@@ -157,32 +171,49 @@ export default function Account() {
                         </Group>
                       ) : (
                         <>
+                          {userCancelledRequest && (
+                            <Alert
+                              variant="filled"
+                              bg="yellow"
+                              icon={<IconAlertCircle />}
+                            >
+                              You cancelled the request to connect your Slack
+                              account.
+                            </Alert>
+                          )}
+
+                          {error && (
+                            <Alert
+                              variant="filled"
+                              color="red.6"
+                              icon={<IconAlertCircle />}
+                            >
+                              An error occurred while connecting your Slack
+                              account. Please try again.
+                            </Alert>
+                          )}
                           <Text
                             c="gray.5"
                             size="sm"
                             style={{ lineHeight: 1.6 }}
                           >
-                            Connect your Slack account to automaticallymute
+                            Connect your Slack account to automatically mute
                             notifications and set your status to during active
                             tasks, helping you stay focused without
                             interruptions.
                           </Text>
-                          <Link
-                            to={slackConnectUrl}
-                            style={{ textDecoration: "none" }}
+
+                          <Button
+                            onClick={handleConnectSlack}
+                            size="md"
+                            variant="filled"
+                            fullWidth
                           >
-                            <Button
-                              onClick={handleConnectSlack}
-                              size="md"
-                              variant="filled"
-                              fullWidth
-                            >
-                              <Group gap="xs">
-                                <IconBrandSlack />
-                                <>Connect to Slack</>
-                              </Group>
-                            </Button>
-                          </Link>
+                            <Group gap="xs">
+                              <IconBrandSlack />
+                              <>Connect to Slack</>
+                            </Group>
+                          </Button>
                         </>
                       )}
                     </>
