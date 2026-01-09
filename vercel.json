@@ -4,6 +4,7 @@
     {
       "source": "/api/:path*",
       "destination": "https://pomo-backend-phi.vercel.app/api/:path*"
-    }
+    },
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
