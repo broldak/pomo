@@ -25,12 +25,12 @@ export default function Account() {
 
   const env = import.meta.env.VITE_VERCEL_ENV;
 
-  let slackAuthorizationUrl = "";
+  let slackConnectUrl = "";
 
   if (env === "production") {
-    slackAuthorizationUrl = `https://pomo-backend-phi.vercel.app/api/v1/integrations/slack/authorize`;
+    slackConnectUrl = `https://pomo-backend-phi.vercel.app/api/v1/integrations/slack/connect`;
   } else {
-    slackAuthorizationUrl = `${window.location.origin}/api/v1/integrations/slack/authorize`;
+    slackConnectUrl = `${window.location.origin}/api/v1/integrations/slack/connect`;
   }
 
   const handleConnectSlack = () => {
@@ -168,7 +168,7 @@ export default function Account() {
                             interruptions.
                           </Text>
                           <Link
-                            to={slackAuthorizationUrl}
+                            to={slackConnectUrl}
                             style={{ textDecoration: "none" }}
                           >
                             <Button
