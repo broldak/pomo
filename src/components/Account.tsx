@@ -33,10 +33,10 @@ export default function Account() {
 
   const [searchParams] = useSearchParams();
 
-  const [userCancelledRequest, setUserCancelledRequest] = useState(
+  const [userCancelledRequest] = useState(
     searchParams.get("cancelled_request") === "true"
   );
-  const [error, setError] = useState(searchParams.get("error") ?? null);
+  const [error] = useState(searchParams.get("error") ?? null);
 
   const mutate = useGetSlackIntegrationRedirectUrlMutation();
 
