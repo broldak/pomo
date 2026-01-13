@@ -4,10 +4,10 @@ import type { SettingsValues } from "../components/Settings";
 const STORAGE_KEY = "pomo-settings";
 
 const DEFAULT_SETTINGS: SettingsValues = {
-  focusDuration: 25,
-  shortBreak: 5,
-  longBreak: 15,
-  blocksBeforeLongBreak: 4,
+  focusDuration: 0.05,
+  shortBreak: 0.05,
+  longBreak: 0.05,
+  blocksBeforeLongBreak: 2,
 };
 
 function loadSettings(): SettingsValues {

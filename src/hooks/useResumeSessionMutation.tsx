@@ -1,20 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
 import useSupabase from "./useSupabase";
 
-const useGetSlackIntegrationRedirectUrl = () => {
+const useResumeSessionMutation = () => {
   const { session } = useSupabase();
 
   return useMutation({
-    mutationFn: async () => {
-      const response = await fetch("/api/v1/integrations/slack/connect", {
-        method: "GET",
+    mutationFn: async (session_id: string) => {
+      const response = await fetch(`/api/v1/sessions/${session_id}/resume`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create slack integration redirect url");
+        throw new Error("Failed to resume session");
       }
 
       return response.json();
@@ -22,4 +22,4 @@ const useGetSlackIntegrationRedirectUrl = () => {
   });
 };
 
-export default useGetSlackIntegrationRedirectUrl;
+export default useResumeSessionMutation;

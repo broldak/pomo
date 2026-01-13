@@ -1,7 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Text, Box, Button, Group, UnstyledButton } from "@mantine/core";
 import { colors, mantineColors } from "../theme";
 import useSettings from "../hooks/useSettings";
+import useAbandonSessionMutation from "../hooks/useAbandonSessionMutation";
+import usePauseSessionMutation from "../hooks/usePauseSessionMutation";
+import useResumeSessionMutation from "../hooks/useResumeSessionMutation";
+import useAdvanceSessionMutation from "../hooks/useAdvanceSessionMutation";
+import useGetCurrentSession from "../hooks/useGetCurrentSession";
 
 type TimerMode = "work" | "shortBreak" | "longBreak";
 
@@ -23,11 +28,64 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
   const shortBreak = settings.shortBreak * 60;
   const longBreak = settings.longBreak * 60;
 
+  const abandonMutation = useAbandonSessionMutation();
+  const pauseMutation = usePauseSessionMutation();
+  const resumeMutation = useResumeSessionMutation();
+  const advanceMutation = useAdvanceSessionMutation();
+
+  const { data: currentSession } = useGetCurrentSession();
+
   const [timeLeft, setTimeLeft] = useState(workDuration);
   const [isRunning, setIsRunning] = useState(false);
   const [mode, setMode] = useState<TimerMode>("work");
-  const [completedPomodoros, setCompletedPomodoros] = useState(0);
+  const [completedPomodoros, setCompletedPomodoros] = useState(
+    currentSession?.focus_cycle_index ?? 0
+  );
   const [isComplete, setIsComplete] = useState(false);
+  const isCompletingRef = useRef(false);
+
+  const handleAbandon = async () => {
+    try {
+      await abandonMutation.mutateAsync(currentSession?.id ?? "");
+      onAbandon();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleToggleTimer = async () => {
+    if (isRunning) {
+      await handlePause();
+      setIsRunning(false);
+    } else {
+      await handleResume();
+      setIsRunning(true);
+    }
+  };
+
+  const handlePause = async () => {
+    try {
+      await pauseMutation.mutateAsync(currentSession?.id ?? "");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleResume = async () => {
+    try {
+      await resumeMutation.mutateAsync(currentSession?.id ?? "");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleAdvance = useCallback(async () => {
+    try {
+      await advanceMutation.mutateAsync(currentSession?.id ?? "");
+    } catch (error) {
+      console.error(error);
+    }
+  }, [advanceMutation, currentSession]);
 
   const getDuration = useCallback(
     (timerMode: TimerMode) => {
@@ -43,7 +101,13 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
     [workDuration, shortBreak, longBreak]
   );
 
-  const handleTimerComplete = useCallback(() => {
+  const handleTimerComplete = useCallback(async () => {
+    try {
+      await handleAdvance();
+    } catch (error) {
+      console.error(error);
+    }
+
     if (mode === "work") {
       const newCount = completedPomodoros + 1;
       setCompletedPomodoros(newCount);
@@ -74,15 +138,25 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
     longBreak,
     shortBreak,
     workDuration,
+    handleAdvance,
   ]);
 
   useEffect(() => {
-    if (!isRunning) return;
+    if (!isRunning) {
+      isCompletingRef.current = false;
+      return;
+    }
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          handleTimerComplete();
+          if (!isCompletingRef.current) {
+            isCompletingRef.current = true;
+            console.log("timer complete");
+            handleTimerComplete().finally(() => {
+              isCompletingRef.current = false;
+            });
+          }
           return 0;
         }
         return prev - 1;
@@ -91,8 +165,6 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
 
     return () => clearInterval(interval);
   }, [isRunning, handleTimerComplete]);
-
-  const toggleTimer = () => setIsRunning(!isRunning);
 
   const resetTimer = () => {
     setIsRunning(false);
@@ -133,7 +205,7 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
           {completedPomodoros} pomodoros completed
         </Text>
         <Button
-          onClick={onAbandon}
+          onClick={handleAbandon}
           size="lg"
           variant="white"
           color={mantineColors.break}
@@ -218,7 +290,7 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
       >
         <Group>
           <Button
-            onClick={toggleTimer}
+            onClick={handleToggleTimer}
             size="xl"
             variant="white"
             color={buttonColor}
@@ -237,7 +309,7 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
           </Button>
         </Group>
 
-        <UnstyledButton onClick={onAbandon}>
+        <UnstyledButton onClick={handleAbandon}>
           <Text size="xs" c={colors.text.secondary}>
             abandon session
           </Text>

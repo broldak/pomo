@@ -18,6 +18,7 @@ import { colors, mantineColors } from "../theme";
 import classes from "./NumberInput.module.css";
 import useSettings from "../hooks/useSettings";
 import { Link } from "react-router";
+import useCreateNewSessionMutation from "../hooks/useCreateNewSessionMutation";
 
 interface TaskSetupProps {
   onStart: (task: string, pomodoros: number) => void;
@@ -28,9 +29,17 @@ export function TaskSetup({ onStart }: TaskSetupProps) {
   const [task, setTask] = useState("");
   const [pomodoros, setPomodoros] = useState<number>(4);
 
-  const handleStart = () => {
+  const mutate = useCreateNewSessionMutation();
+
+  const handleStart = async () => {
     if (task.trim() && pomodoros > 0) {
-      onStart(task.trim(), pomodoros);
+      try {
+        await mutate.mutateAsync(task.trim());
+
+        onStart(task.trim(), pomodoros);
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 

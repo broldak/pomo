@@ -66,12 +66,12 @@ export function Settings({ settings, onSave }: SettingsProps) {
             Focus duration (minutes)
           </Text>
           <NumberInput
-            value={settings.focusDuration}
+            value={focusDuration}
             onChange={(val) =>
               setFocusDuration(typeof val === "number" ? val : 25)
             }
             min={1}
-            max={120}
+            max={45}
             size="md"
             classNames={{ control: styles.numberInputControl }}
             styles={{
@@ -90,10 +90,10 @@ export function Settings({ settings, onSave }: SettingsProps) {
             Short break (minutes)
           </Text>
           <NumberInput
-            value={settings.shortBreak}
+            value={shortBreak}
             onChange={(val) => setShortBreak(typeof val === "number" ? val : 5)}
             min={1}
-            max={30}
+            max={20}
             size="md"
             classNames={{ control: styles.numberInputControl }}
             styles={{
@@ -112,10 +112,10 @@ export function Settings({ settings, onSave }: SettingsProps) {
             Long break (minutes)
           </Text>
           <NumberInput
-            value={settings.longBreak}
+            value={longBreak}
             onChange={(val) => setLongBreak(typeof val === "number" ? val : 15)}
             min={1}
-            max={60}
+            max={45}
             size="md"
             classNames={{ control: styles.numberInputControl }}
             styles={{
@@ -134,7 +134,7 @@ export function Settings({ settings, onSave }: SettingsProps) {
             Blocks before long break
           </Text>
           <NumberInput
-            value={settings.blocksBeforeLongBreak}
+            value={blocksBeforeLongBreak}
             onChange={(val) =>
               setBlocksBeforeLongBreak(typeof val === "number" ? val : 4)
             }
