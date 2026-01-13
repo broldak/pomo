@@ -20,11 +20,7 @@ import useSettings from "../hooks/useSettings";
 import { Link } from "react-router";
 import useCreateNewSessionMutation from "../hooks/useCreateNewSessionMutation";
 
-interface TaskSetupProps {
-  onStart: (task: string, pomodoros: number) => void;
-}
-
-export function TaskSetup({ onStart }: TaskSetupProps) {
+export function TaskSetup() {
   const { settings } = useSettings();
   const [task, setTask] = useState("");
   const [pomodoros, setPomodoros] = useState<number>(4);
@@ -35,8 +31,6 @@ export function TaskSetup({ onStart }: TaskSetupProps) {
     if (task.trim() && pomodoros > 0) {
       try {
         await mutate.mutateAsync(task.trim());
-
-        onStart(task.trim(), pomodoros);
       } catch (error) {
         console.error(error);
       }

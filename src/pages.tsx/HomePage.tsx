@@ -7,10 +7,6 @@ export default function HomePage() {
   const { data: currentSession, isLoading: isLoadingCurrentSession } =
     useGetCurrentSession();
 
-  const handleStartSession = (task: string, pomodoros: number) => {
-    setSession({ task, totalPomodoros: pomodoros });
-  };
-
   if (isLoadingCurrentSession) {
     return (
       <Box h="100vh" w="100vw" bg="dark.8">
@@ -30,5 +26,5 @@ export default function HomePage() {
     );
   }
 
-  return <TaskSetup onStart={handleStartSession} />;
+  return <TaskSetup />;
 }
