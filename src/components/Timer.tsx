@@ -19,10 +19,9 @@ function formatTime(seconds: number): string {
 interface TimerProps {
   task: string;
   totalPomodoros: number;
-  onAbandon: () => void;
 }
 
-export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
+export function Timer({ task, totalPomodoros }: TimerProps) {
   const { settings } = useSettings();
   const workDuration = settings.focusDuration * 60;
   const shortBreak = settings.shortBreak * 60;
@@ -47,7 +46,6 @@ export function Timer({ task, totalPomodoros, onAbandon }: TimerProps) {
   const handleAbandon = async () => {
     try {
       await abandonMutation.mutateAsync(currentSession?.id ?? "");
-      onAbandon();
     } catch (error) {
       console.error(error);
     }
